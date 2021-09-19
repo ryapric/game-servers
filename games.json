@@ -1,0 +1,9 @@
+{
+  "valheim": {
+    "game_root": "valheim",
+    "app_id": "896660",
+    "server_app_id": "892970",
+    "server_exec": "valheim_server.x86_64",
+    "data_dir": "$HOME/.config/unity3d/IronGate/Valheim/worlds"
+  }
+}
