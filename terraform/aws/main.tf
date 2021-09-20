@@ -24,6 +24,7 @@ resource "aws_s3_bucket" "backups" {
 ####################
 resource "aws_instance" "main" {
   ami                    = data.aws_ami.latest.id
+  iam_instance_profile   = aws_iam_instance_profile.main.id
   instance_type          = var.instance_type
   key_name               = var.keypair_name
   subnet_id              = aws_subnet.public[0].id
