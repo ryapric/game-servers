@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Mostly taken from here:
+# https://valheim.fandom.com/wiki/Valheim_Dedicated_Server
+
 game_root=$(jq -rc '.valheim.game_root' "${HOME}"/games.json)
 cd "${HOME}"/Steam/steamapps/common/"${game_root}" || exit 1
 
@@ -18,8 +21,6 @@ chmod +x ./valheim_server.x86_64
 ./valheim_server.x86_64 \
   -name "${server_name}" \
   -port 2456 \
-  -nographics \
-  -batchmode \
   -world "${world_name}" \
   -password "${password}" \
-  -public 1
+  -public 0

@@ -5,7 +5,7 @@ world_name="${1}"
 server_cfg="${world_name}_server.cfg"
 
 docker run \
-  -it \
+  -dit \
   -p 2456-2457:2456-2457/tcp \
   -p 2456-2457:2456-2457/udp \
   -v /home/ryan/game-server-backups/valheim/"${world_name}":/root/.config/unity3d/IronGate/Valheim \
