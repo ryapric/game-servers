@@ -51,10 +51,11 @@ data "template_file" "user_data" {
     fi
 
     # Set up backup script
-    cat <<-EOF > /usr/local/bin/backup_server_data.sh
-      tar -C /home/ubuntu -czf backups.tar.gz /home/ubuntu/game-server-backups
-      aws s3 cp /home/ubuntu/backups.tar.gz s3://game-server-backups-"$account_id"/backups.tar.gz
-    EOF
-    echo "0 * * * * bash /usr/local/bin/backup_server_data.sh" > /etc/cron.d/backup_server_data
+    {
+      echo "#!/usr/bin/env bash"
+      echo "tar -C /home/ubuntu -czf backups.tar.gz /home/ubuntu/game-server-backups"
+      echo "aws s3 cp /home/ubuntu/backups.tar.gz s3://game-server-backups-$account_id/backups.tar.gz"
+    } > /usr/local/bin/backup_game_data.sh
+    echo "0 * * * * root /bin/bash /usr/local/bin/backup_game_data.sh" > /etc/cron.d/backup_game_data
   SCRIPT
 }
