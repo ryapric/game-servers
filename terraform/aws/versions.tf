@@ -8,5 +8,8 @@ terraform {
     http = {
       source = "hashicorp/http"
     }
+    template = {
+      source = "hashicorp/template"
+    }
   }
 }
