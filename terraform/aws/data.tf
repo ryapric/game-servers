@@ -55,7 +55,29 @@ data "template_file" "user_data" {
       echo "#!/usr/bin/env bash"
       echo "tar -C /home/ubuntu -czf backups.tar.gz /home/ubuntu/game-server-backups"
       echo "aws s3 cp /home/ubuntu/backups.tar.gz s3://game-server-backups-$account_id/backups.tar.gz"
-    } > /usr/local/bin/backup_game_data.sh
+    } > /usr/local/bin/backup_game_data
+    chmod +x /usr/local/bin/backup_game_data
     echo "0 * * * * root /bin/bash /usr/local/bin/backup_game_data.sh" > /etc/cron.d/backup_game_data
+
+    # Also run backup at shutdown
+    {
+      echo "[Unit]"
+      echo "Description=Run backup at shutdown"
+      echo "Requires=network.target"
+      echo "DefaultDependencies=no"
+      echo "Before=shutdown.target reboot.target"
+      echo ""
+      echo "[Service]"
+      echo "Type=oneshot"
+      echo "RemainAfterExit=true"
+      echo "ExecStart=/bin/true"
+      echo "ExecStop=/bin/bash /usr/local/bin/backup_game_data"
+      echo ""
+      echo "[Install]"
+      echo "WantedBy=multi-user.target"
+    } > /etc/systemd/system/backup_game_data_on_shutdown.service
+    systemctl daemon-reload
+    systemctl enable backup_game_data_on_shutdown.service
+    systemctl start backup_game_data_on_shutdown.service
   SCRIPT
 }

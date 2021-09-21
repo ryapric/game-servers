@@ -84,10 +84,10 @@ resource "aws_security_group" "main" {
 
   ingress = [
     {
-      description      = "ICMP from everywhere"
-      from_port        = 0
+      description      = "Ping from everywhere"
+      from_port        = 8
       to_port          = 0
-      protocol         = "-1"
+      protocol         = "icmp"
       cidr_blocks      = ["0.0.0.0/0"]
       ipv6_cidr_blocks = ["::/0"]
       prefix_list_ids  = []
