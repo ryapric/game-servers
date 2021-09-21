@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "backups" {
     enabled = true
 
     noncurrent_version_expiration {
-      days = 5
+      days = 3
     }
   }
 
@@ -22,23 +22,38 @@ resource "aws_s3_bucket" "backups" {
 ####################
 # Server Resources #
 ####################
-resource "aws_spot_instance_request" "main" {
-  instance_interruption_behavior = "stop"
-  spot_type                      = "persistent"
-  wait_for_fulfillment           = true
+resource "aws_eip" "main" {
+  vpc = true
+}
 
-  ami                    = data.aws_ami.latest.id
-  iam_instance_profile   = aws_iam_instance_profile.main.id
-  instance_type          = var.instance_type
-  key_name               = var.keypair_name
+resource "aws_eip_association" "main" {
+  allocation_id = aws_eip.main.id
+  instance_id   = aws_instance.main.id
+}
+
+resource "aws_instance" "main" {
+  launch_template {
+    id      = aws_launch_template.main.id
+    version = aws_launch_template.main.latest_version
+  }
+
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.main.id]
+}
 
-  # TODO: set up backup script
-  user_data = data.template_file.user_data.rendered
+resource "aws_launch_template" "main" {
+  image_id      = data.aws_ami.latest.id
+  instance_type = var.instance_type
+  key_name      = var.keypair_name
 
-  root_block_device {
-    volume_size = var.volume_size
+  user_data = base64encode(data.template_file.user_data.rendered)
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size = var.volume_size
+    }
   }
 
   # NOT unlimited, Spot Instances are more likely to be shut down if so.
@@ -47,13 +62,25 @@ resource "aws_spot_instance_request" "main" {
   credit_specification {
     cpu_credits = "standard"
   }
-}
 
-resource "aws_eip" "main" {
-  vpc = true
-}
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.main.arn
+  }
 
-resource "aws_eip_association" "main" {
-  allocation_id = aws_eip.main.id
-  instance_id   = aws_spot_instance_request.main.spot_instance_id # this attribute is subject to change
+  instance_market_options {
+    market_type = "spot"
+
+    spot_options {
+      instance_interruption_behavior = "stop"
+      spot_instance_type             = "persistent"
+    }
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "ryapric/game-servers"
+    }
+  }
 }

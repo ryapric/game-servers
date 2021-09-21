@@ -47,7 +47,7 @@ data "template_file" "user_data" {
     account_id=$(aws sts get-caller-identity --query 'Account' --output text)
     if [[ ! -d /home/ubuntu/game-server-backups ]]; then
       aws s3 cp s3://game-server-backups-"$account_id"/backups.tar.gz /home/ubuntu/backups.tar.gz
-      tar -C /home/ubuntu -xzf /home/ubuntu/backups.tar.gz
+      tar -v -C /home/ubuntu -xzf /home/ubuntu/backups.tar.gz
     fi
 
     # Set up backup script
