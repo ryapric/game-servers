@@ -41,8 +41,11 @@ resource "aws_spot_instance_request" "main" {
     volume_size = var.volume_size
   }
 
+  # NOT unlimited, Spot Instances are more likely to be shut down if so.
+  # However, this doesn't seem to take right now -- the instance still creates
+  # itself using unlimited credit spec, so you might need to manually change it
   credit_specification {
-    cpu_credits = "standard" # NOT unlimited, Spot Instances are more likely to be shut down if so
+    cpu_credits = "standard"
   }
 }
 
