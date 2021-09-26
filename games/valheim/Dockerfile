@@ -1,6 +1,6 @@
 FROM ryapric/game-servers:latest
 
-COPY main.sh .
+COPY docker-entrypoint.sh
 COPY *_server.cfg .
 
 EXPOSE 2456-2457/tcp
