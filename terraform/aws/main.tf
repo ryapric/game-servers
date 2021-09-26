@@ -1,8 +1,8 @@
 ####################
 # Backup S3 bucket #
 ####################
-resource "aws_s3_bucket" "backups" {
-  bucket = "game-server-backups-${data.aws_caller_identity.current.account_id}"
+resource "aws_s3_bucket" "main" {
+  bucket = "ryapric-game-servers-${data.aws_caller_identity.current.account_id}"
   acl    = "private"
 
   lifecycle_rule {
@@ -22,65 +22,42 @@ resource "aws_s3_bucket" "backups" {
 ####################
 # Server Resources #
 ####################
+resource "aws_spot_instance_request" "main" {
+  instance_interruption_behavior = "stop"
+  spot_type                      = "persistent"
+  wait_for_fulfillment           = true
+
+  ami                    = data.aws_ami.latest.id
+  iam_instance_profile   = aws_iam_instance_profile.main.name
+  instance_type          = var.instance_type
+  key_name               = var.keypair_name
+  subnet_id              = aws_subnet.public[0].id
+  user_data              = file("./user_data.sh")
+  vpc_security_group_ids = [aws_security_group.main.id]
+
+  credit_specification {
+    cpu_credits = "standard"
+  }
+
+  root_block_device {
+    volume_size = var.volume_size
+  }
+
+  tags = {
+    Name = "ryapric/game-servers"
+  }
+
+  # Need this to apply tags to actual instances, since this resource can't do that itself
+  provisioner "local-exec" {
+    command = "aws ec2 create-tags --resources ${self.spot_instance_id} --tags Key=Name,Value=ryapric/game-servers Key=spot-req-id,Value=${self.id}"
+  }
+}
+
 resource "aws_eip" "main" {
   vpc = true
 }
 
 resource "aws_eip_association" "main" {
   allocation_id = aws_eip.main.id
-  instance_id   = aws_instance.main.id
-}
-
-resource "aws_instance" "main" {
-  launch_template {
-    id      = aws_launch_template.main.id
-    version = aws_launch_template.main.latest_version
-  }
-
-  subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.main.id]
-}
-
-resource "aws_launch_template" "main" {
-  image_id      = data.aws_ami.latest.id
-  instance_type = var.instance_type
-  key_name      = var.keypair_name
-
-  user_data = base64encode(data.template_file.user_data.rendered)
-
-  block_device_mappings {
-    device_name = "/dev/sda1"
-
-    ebs {
-      volume_size = var.volume_size
-    }
-  }
-
-  # NOT unlimited, Spot Instances are more likely to be shut down if so.
-  # However, this doesn't seem to take right now -- the instance still creates
-  # itself using unlimited credit spec, so you might need to manually change it
-  credit_specification {
-    cpu_credits = "standard"
-  }
-
-  iam_instance_profile {
-    arn = aws_iam_instance_profile.main.arn
-  }
-
-  instance_market_options {
-    market_type = "spot"
-
-    spot_options {
-      instance_interruption_behavior = "stop"
-      spot_instance_type             = "persistent"
-    }
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-
-    tags = {
-      Name = "ryapric/game-servers"
-    }
-  }
+  instance_id   = aws_spot_instance_request.main.spot_instance_id
 }

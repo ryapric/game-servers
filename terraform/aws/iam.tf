@@ -39,8 +39,8 @@ resource "aws_iam_role" "main" {
               "s3:Put*"
             ],
             "Resource": [
-              "${aws_s3_bucket.backups.arn}",
-              "${aws_s3_bucket.backups.arn}/*"
+              "${aws_s3_bucket.main.arn}",
+              "${aws_s3_bucket.main.arn}/*"
             ]
           }
         ]

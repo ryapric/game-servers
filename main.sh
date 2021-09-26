@@ -3,6 +3,7 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Install Steam games
 rm /etc/apt/sources.list
 
 dpkg --add-architecture i386
@@ -20,7 +21,7 @@ apt-get install -y \
 
 curl -fsSL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar vxzf -
 
-for game in $(jq -rc '.[]' "${HOME}"/games.json); do
+for game in $(jq -rc '.[]' "${HOME}"/steam-games.json); do
   game_root=$(jq -rc '.game_root' <(echo "${game}"))
   app_id=$(jq -rc '.app_id' <(echo "${game}"))
   mkdir -p "${HOME}"/Steam/steamapps/common/"${game_root}"

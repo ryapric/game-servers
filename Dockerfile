@@ -3,7 +3,7 @@ FROM debian:bullseye
 WORKDIR /root
 
 COPY main.sh .
-COPY games.json .
+COPY steam-games.json .
 COPY docker-entrypoint.sh .
 
 RUN bash main.sh
