@@ -17,6 +17,10 @@ data "aws_ami" "latest" {
   }
 }
 
+data "aws_s3_bucket" "backup" {
+  bucket = local.backup_bucket_name
+}
+
 data "http" "my_ip" {
   url = "https://ipv4.icanhazip.com"
 }

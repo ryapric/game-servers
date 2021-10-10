@@ -1,4 +1,5 @@
 locals {
+  backup_bucket_name  = "${var.backup_bucket_name_prefix}-${data.aws_caller_identity.current.account_id}"
   n_subnets           = 1 # length(data.aws_availability_zones.available.names)
   use_private_subnets = var.use_private_subnets ? 1 : 0
 
@@ -29,6 +30,12 @@ locals {
       protocol = "udp"
     }
   ]
+}
+
+variable "backup_bucket_name_prefix" {
+  description = "The root prefix (with no trailing special characters) of the S3 bucket name used for game data backups (which is deployed separately for persistence)"
+  type        = string
+  default     = "ryapric-game-servers"
 }
 
 variable "instance_type" {
