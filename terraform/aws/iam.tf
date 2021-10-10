@@ -39,8 +39,8 @@ resource "aws_iam_role" "main" {
               "s3:Put*"
             ],
             "Resource": [
-              "${aws_s3_bucket.main.arn}",
-              "${aws_s3_bucket.main.arn}/*"
+              "arn:aws:s3:::ryapric-game-servers-${data.aws_caller_identity.current.account_id}",
+              "arn:aws:s3:::ryapric-game-servers-${data.aws_caller_identity.current.account_id}/*"
             ]
           }
         ]

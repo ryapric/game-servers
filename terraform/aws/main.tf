@@ -1,27 +1,35 @@
-####################
-# Backup S3 bucket #
-####################
-resource "aws_s3_bucket" "main" {
-  bucket = "ryapric-game-servers-${data.aws_caller_identity.current.account_id}"
-  acl    = "private"
+# ####################
+# # Backup S3 bucket #
+# ####################
+# # This was removed from state tracking via `terraform state rm`, so the other resources could be destroyed;
+# # best to deploy this separately in the future, BUT it will need to exist for the IAM Role to succeed
+# resource "aws_s3_bucket" "main" {
+#   bucket = "ryapric-game-servers-${data.aws_caller_identity.current.account_id}"
+#   acl    = "private"
 
-  lifecycle_rule {
-    id      = "Expire"
-    enabled = true
+#   lifecycle_rule {
+#     id      = "Expire"
+#     enabled = true
 
-    noncurrent_version_expiration {
-      days = 3
-    }
-  }
+#     noncurrent_version_expiration {
+#       days = 3
+#     }
+#   }
 
-  versioning {
-    enabled = true
-  }
-}
+#   versioning {
+#     enabled = true
+#   }
+# }
 
 ####################
 # Server Resources #
 ####################
+# module "game_server" {
+#   source = "https://github.com/opensourcecorp/gaia//providers/aws/ec2_instance"
+
+
+# }
+
 resource "aws_spot_instance_request" "main" {
   instance_interruption_behavior = "stop"
   spot_type                      = "persistent"
