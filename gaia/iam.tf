@@ -1,10 +1,10 @@
 resource "aws_iam_instance_profile" "main" {
-  name_prefix = "game-servers-"
+  name_prefix = "ryapric-game-servers-"
   role        = aws_iam_role.main.name
 }
 
 resource "aws_iam_role" "main" {
-  name_prefix = "game-servers-"
+  name_prefix = "ryapric-game-servers-"
   path        = "/"
 
   assume_role_policy = <<-EOF
