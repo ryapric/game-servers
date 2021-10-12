@@ -4,7 +4,7 @@ set -euo pipefail
 # Mostly taken from here:
 # https://valheim.fandom.com/wiki/Valheim_Dedicated_Server
 
-game_root=$(jq -rc '.valheim.game_root' "${HOME}"/games.json)
+game_root=$(jq -rc '.valheim.game_root' "${HOME}"/steam-games.json)
 cd "${HOME}"/Steam/steamapps/common/"${game_root}" || exit 1
 
 server_cfg="${1}"
