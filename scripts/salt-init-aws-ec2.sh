@@ -7,7 +7,7 @@ systemctl stop salt-master
 
 # Salt Minion should already be installed, so give it a new ID & re-init
 sed -i -E \
-  -e 's/^id:.*$/id: ryapric-game-servers/' \
+  -e 's/^id:.*$/id: ryapric-game-servers-aws-ec2/' \
   -e 's/^master:.*$/master: 10.0.1.100/' \
   /etc/salt/minion
 systemctl restart salt-minion

@@ -53,7 +53,8 @@ ExecStop=/bin/bash /usr/local/bin/backup_game_data
 
 [Install]
 WantedBy=multi-user.target
+EOF
+
 systemctl daemon-reload
 systemctl enable backup_game_data_on_shutdown.service
 systemctl start backup_game_data_on_shutdown.service
-EOF

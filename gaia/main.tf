@@ -9,7 +9,7 @@ module "ec2" {
   name_tag              = "ryapric/game-servers"
   source_address        = "https://github.com/ryapric/game-servers.git"
   source_ami_filter     = "*aether*"
-  user_data_filepath    = "../scripts/salt-init.sh"
+  user_data_filepath    = "../scripts/salt-init-aws-ec2.sh"
   use_static_ip         = true
 
   sg_rules_maplist = local.game_ports
